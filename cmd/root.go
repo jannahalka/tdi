@@ -46,7 +46,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&datafile, "datafile", home + string(os.PathSeparator) + ".todos.json", "datafile to store todos")
+	rootCmd.PersistentFlags().StringVar(&datafile, "datafile", home + string(os.PathSeparator) + ".todos.csv", "datafile to store todos")
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.todo-cli.yaml)")
 

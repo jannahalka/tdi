@@ -8,8 +8,7 @@ import (
 	"os"
 	"strconv"
 	"text/tabwriter"
-
-	"github.com/jannahalka/todo-cli/todo"
+	"github.com/jannahalka/tdi/todo"
 	"github.com/spf13/cobra"
 )
 

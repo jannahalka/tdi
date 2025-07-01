@@ -5,28 +5,27 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"github.com/jannahalka/todo-cli/todo"
+	"github.com/jannahalka/tdi/todo"
 	"github.com/spf13/cobra"
 )
 
 var priority int
 
 func addRun(cmd *cobra.Command, args []string) {
-	items, err := todo.ReadItems(datafile)
+	// items, err := todo.ReadItems(datafile)
 
-	if err != nil {
-		log.Printf("%v", err)
-	}
+	items := []todo.Item{}
 
 	for _, x := range args {
-		fmt.Printf("Argument: %v\n", x)
 		item := todo.Item{Text:x}
 		item.SetPriority(priority)
 		items = append(items, item)
 	}
 
-	err = todo.SaveItems(datafile, items)
+	fmt.Println("Hello")
+
+	err := todo.SaveItems(datafile, items)
+	fmt.Println("Hello2")
 
 	if err != nil {
 		fmt.Errorf("%v", err)

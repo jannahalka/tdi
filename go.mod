@@ -1,4 +1,4 @@
-module github.com/jannahalka/todo-cli
+module github.com/jannahalka/tdi
 
 go 1.21.6
 
