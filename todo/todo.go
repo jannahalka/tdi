@@ -2,7 +2,6 @@ package todo
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -67,7 +66,6 @@ func ReadItems(filename string) ([]Item, error) {
 	}
 
 	for _, row := range data {
-		fmt.Println(row)
 		text := row[0]
 		priority, err := strconv.Atoi(row[1])
 		if err != nil {
