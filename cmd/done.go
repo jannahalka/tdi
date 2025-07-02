@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"log"
+	"slices"
+	"strconv"
+
 	"github.com/jannahalka/tdi/todo"
 	"github.com/spf13/cobra"
-	"log"
-	"strconv"
 )
 
 func doneRun(cmd *cobra.Command, args []string) {
@@ -20,12 +22,15 @@ func doneRun(cmd *cobra.Command, args []string) {
 			log.Fatalln(err)
 		}
 
-		item := todo.FindItem(items, id)
-		if item == nil {
+		idx := slices.IndexFunc(items, func(item todo.Item) bool {
+			return item.Id == id
+
+		})
+		if idx == -1 {
 			log.Fatalln("Could not find the id")
 		}
 
-		item.SetToDone()
+		items[idx].SetToDone()
 	}
 
 	err = todo.SaveItems(datafile, items)
