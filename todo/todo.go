@@ -2,14 +2,28 @@ package todo
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"strconv"
 )
 
 type Item struct {
-	Text string
+	Id       int
+	Text     string
 	Priority int
-	Done bool
+	Done     bool
+}
+
+func (i Item) String() string {
+	var doneText string
+
+	if i.Done == false {
+		doneText = "uncomplete"
+	} else {
+		doneText = "complete"
+	}
+	return fmt.Sprint(strconv.Itoa(i.Id) + "\t" + strconv.Itoa(i.Priority) + "\t" + i.Text + "\t" + doneText)
+
 }
 
 func (i *Item) SetPriority(pri int) {
@@ -23,8 +37,13 @@ func (i *Item) SetPriority(pri int) {
 	}
 }
 
+func (i *Item) SetToDone() {
+	i.Done = true
+}
+
 func (i Item) ToRow() []string {
-	row := []string{i.Text, strconv.Itoa(i.Priority)}
+
+	row := []string{strconv.Itoa(i.Id), i.Text, strconv.Itoa(i.Priority), strconv.FormatBool(i.Done)}
 	return row
 }
 
@@ -36,12 +55,14 @@ func SaveItems(filename string, items []Item) error {
 	defer file.Close()
 
 	w := csv.NewWriter(file)
+	defer w.Flush()
+
 	for _, i := range items {
 		if err := w.Write(i.ToRow()); err != nil {
 			return err
 		}
 	}
-	defer w.Flush()
+
 	if err := w.Error(); err != nil {
 		return err
 	}
@@ -51,6 +72,7 @@ func SaveItems(filename string, items []Item) error {
 
 func ReadItems(filename string) ([]Item, error) {
 	var items []Item
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return []Item{}, err
@@ -58,7 +80,6 @@ func ReadItems(filename string) ([]Item, error) {
 	defer file.Close()
 
 	r := csv.NewReader(file)
-
 	data, err := r.ReadAll()
 
 	if err != nil {
@@ -66,13 +87,25 @@ func ReadItems(filename string) ([]Item, error) {
 	}
 
 	for _, row := range data {
-		text := row[0]
-		priority, err := strconv.Atoi(row[1])
+		text := row[1]
+
+		priority, err := strconv.Atoi(row[2])
 		if err != nil {
 			return []Item{}, err
 		}
 
-		items = append(items, Item{Text:text, Priority: priority})
+		id, err := strconv.Atoi(row[0])
+		if err != nil {
+			return []Item{}, err
+		}
+
+		done, err := strconv.ParseBool(row[3])
+
+		if err != nil {
+			return []Item{}, err
+		}
+
+		items = append(items, Item{Text: text, Priority: priority, Id: id, Done: done})
 	}
 
 	return items, nil

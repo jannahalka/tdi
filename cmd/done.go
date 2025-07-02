@@ -1,27 +1,46 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/jannahalka/tdi/todo"
 	"github.com/spf13/cobra"
+	"log"
+	"slices"
+	"strconv"
 )
 
-func listRun(cmd *cobra.Command, args []string) {
+func doneRun(cmd *cobra.Command, args []string) {
 	items, err := todo.ReadItems(datafile)
-
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
-	for _, i := range items {
-		fmt.Println(i)
+	n := len(items)
+
+	for _, id := range args {
+		id, err := strconv.Atoi(id)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		if id > n || id < n {
+			log.Fatalf("Id: %v is an invalid argument", id)
+			return
+		}
+
+		idx := slices.IndexFunc(items, func(i todo.Item) bool { return i.Id == id })
+		items[idx].SetToDone()
 	}
 
+	err = todo.SaveItems(datafile, items)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
-// listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use:   "list",
+// doneCmd represents the done command
+var doneCmd = &cobra.Command{
+	Use:   "done",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -29,19 +48,19 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: listRun,
+	Run: doneRun,
 }
 
 func init() {
-	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(doneCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// doneCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// doneCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
