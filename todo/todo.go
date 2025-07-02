@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 )
 
@@ -109,4 +110,14 @@ func ReadItems(filename string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+func FindItem(items []Item, itemId int) *Item {
+	idx := slices.IndexFunc(items, func(i Item) bool { return i.Id == itemId })
+
+	if idx == -1 {
+		return nil
+	}
+
+	return &items[idx]
 }
