@@ -14,6 +14,10 @@ func addRun(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	if priority < 1 || priority > 3 {
+		log.Fatalln("Cannot set the priority outside the 1-3 range")
+	}
+
 	for _, x := range args {
 		var lastId int
 		n := len(items)
@@ -32,7 +36,7 @@ func addRun(cmd *cobra.Command, args []string) {
 	err = todo.SaveItems(datafile, items)
 
 	if err != nil {
-		log.Fatal("%v", err)
+		log.Fatalln(err)
 	}
 }
 
@@ -45,6 +49,5 @@ var addCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-
 	addCmd.Flags().IntVarP(&priority, "priority", "p", 2, "Priority:1,2,3")
 }

@@ -4,8 +4,8 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"slices"
 	"strconv"
+	"text/tabwriter"
 )
 
 type Item struct {
@@ -19,23 +19,15 @@ func (i Item) String() string {
 	var doneText string
 
 	if i.Done == false {
-		doneText = "uncomplete"
+		doneText = "\u274C"
 	} else {
-		doneText = "complete"
+		doneText = "\u2705"
 	}
-	return fmt.Sprint(strconv.Itoa(i.Id) + "\t" + strconv.Itoa(i.Priority) + "\t" + i.Text + "\t" + doneText)
-
+	return fmt.Sprint(strconv.Itoa(i.Id) + "\t" + i.Text + "\t" + doneText + "\t" + strconv.Itoa(i.Priority))
 }
 
 func (i *Item) SetPriority(pri int) {
-	switch pri {
-	case 1:
-		i.Priority = 1
-	case 3:
-		i.Priority = 3
-	default:
-		i.Priority = 2
-	}
+	i.Priority = pri
 }
 
 func (i *Item) SetToDone() {
@@ -46,6 +38,18 @@ func (i Item) ToRow() []string {
 
 	row := []string{strconv.Itoa(i.Id), i.Text, strconv.Itoa(i.Priority), strconv.FormatBool(i.Done)}
 	return row
+}
+
+func DisplayTodos(items []Item) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+	defer w.Flush()
+
+	fmt.Fprintln(w, "id\ttask\tstatus\tpriority")
+	fmt.Fprintln(w, "--\t-------------------------------------\t---\t---")
+
+	for _, i := range items {
+		fmt.Fprintln(w, i)
+	}
 }
 
 func SaveItems(filename string, items []Item) error {
@@ -101,7 +105,6 @@ func ReadItems(filename string) ([]Item, error) {
 		}
 
 		done, err := strconv.ParseBool(row[3])
-
 		if err != nil {
 			return []Item{}, err
 		}
@@ -110,4 +113,15 @@ func ReadItems(filename string) ([]Item, error) {
 	}
 
 	return items, nil
+}
+
+type ByPri []Item
+
+func (s ByPri) Len() int      { return len(s) }
+func (s ByPri) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s ByPri) Less(i, j int) bool {
+	if s[i].Priority == s[j].Priority {
+		return s[i].Id < s[j].Id
+	}
+	return s[i].Priority < s[j].Priority
 }
